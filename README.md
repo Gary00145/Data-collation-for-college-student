@@ -1,3 +1,6 @@
+For the first use, please use pip install -r requirements.txt to install the required Python packages.
+
+
 Analysis Report on College Student Data Organization Platform Program  
 
 

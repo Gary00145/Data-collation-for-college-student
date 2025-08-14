@@ -12,11 +12,6 @@ import fitz  # 使用最新版 PyMuPDF 1.23.0 或更高版本
 import shutil
 
 
-
-
-
-
-
 class PreviewWindow(QWidget):
     """文件预览窗口 - 使用安全预览模式"""
 

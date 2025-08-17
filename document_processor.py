@@ -164,8 +164,10 @@ class DocumentProcessor:
     def is_heading(text):
         """判断是否为标题的简单实现"""
         # 可以根据您的文档特点扩展此方法
-        heading_keywords = ["目录", "章节", "节", "第", "摘要", "引言", "结论", "参考"]
-        if len(text) < 50 and any(keyword in text for keyword in heading_keywords):
+        heading_keywords = ["目录", "章节", "节", "第", "摘要", "引言", "结论", "参考", "概述", "总结", "要点", "重点"]
+        # 标题通常较短且包含关键词，或者以数字开头的章节标题
+        if (len(text) < 50 and any(keyword in text for keyword in heading_keywords)) or \
+           (len(text) < 30 and re.match(r"^[0-9]+[、. ]", text)):
             return True
         return False
 
@@ -176,21 +178,29 @@ class DocumentProcessor:
         """提取Word文档内容"""
         doc = Document(filepath)
         content = {"metadata": {}, "sections": []}
-        current_section = {"title": "引言", "content": []}
+        current_section = None
 
         for para in doc.paragraphs:
-            if para.style.name.startswith('Heading'):
-                # 新章节开始
-                if current_section['content']:
-                    content['sections'].append(current_section)
-                current_section = {
-                    'title': para.text.strip(),
-                    'content': [para.text]
-                }
-            else:
-                current_section['content'].append(para.text)
+            text = para.text.strip()
+            if text:  # 只处理非空段落
+                if para.style.name.startswith('Heading') or DocumentProcessor.is_heading(text):
+                    # 新章节开始
+                    if current_section and current_section['content']:
+                        content['sections'].append(current_section)
+                    current_section = {
+                        'title': text,
+                        'content': [text]
+                    }
+                else:
+                    # 内容段落
+                    if current_section is None:
+                        current_section = {
+                            'title': "文档内容",
+                            'content': []
+                        }
+                    current_section['content'].append(text)
 
-        if current_section['content']:
+        if current_section and current_section['content']:
             content['sections'].append(current_section)
         return content
 
@@ -199,24 +209,62 @@ class DocumentProcessor:
         """提取PPT内容"""
         prs = Presentation(filepath)
         content = {"metadata": {}, "sections": []}
+        current_section = None
 
         for i, slide in enumerate(prs.slides):
             slide_title = f"幻灯片 {i + 1}"
             slide_content = []
 
             # 提取幻灯片标题
-            if slide.shapes.title:
-                slide_title = slide.shapes.title.text
+            if slide.shapes.title and slide.shapes.title.text.strip():
+                slide_title = slide.shapes.title.text.strip()
 
             # 提取内容
             for shape in slide.shapes:
-                if hasattr(shape, "text") and shape != slide.shapes.title:
-                    slide_content.append(shape.text)
+                if hasattr(shape, "text") and shape != slide.shapes.title and shape.text.strip():
+                    # 尝试识别标题和内容结构
+                    text = shape.text.strip()
+                    if DocumentProcessor.is_heading(text):
+                        # 如果是标题，创建新章节
+                        if current_section and current_section['content']:
+                            content['sections'].append(current_section)
+                        current_section = {
+                            'title': text,
+                            'content': []
+                        }
+                    else:
+                        # 如果是内容，添加到当前章节
+                        if current_section is None:
+                            current_section = {
+                                'title': slide_title,
+                                'content': []
+                            }
+                        current_section['content'].append(text)
 
-            content['sections'].append({
-                'title': slide_title,
-                'content': '\n'.join(slide_content)
-            })
+        # 添加最后一节
+        if current_section and current_section['content']:
+            content['sections'].append(current_section)
+            
+        # 如果没有识别出结构，使用默认方式
+        if not content['sections']:
+            for i, slide in enumerate(prs.slides):
+                slide_title = f"幻灯片 {i + 1}"
+                slide_content = []
+
+                # 提取幻灯片标题
+                if slide.shapes.title and slide.shapes.title.text.strip():
+                    slide_title = slide.shapes.title.text.strip()
+
+                # 提取内容
+                for shape in slide.shapes:
+                    if hasattr(shape, "text") and shape != slide.shapes.title and shape.text.strip():
+                        slide_content.append(shape.text.strip())
+
+                content['sections'].append({
+                    'title': slide_title,
+                    'content': slide_content
+                })
+                
         return content
 
     # generate_knowledge_tree 保持不变
@@ -237,17 +285,87 @@ class DocumentProcessor:
     @staticmethod
     def export_to_word(knowledge_tree, output_path):
         doc = Document()
-
+        
+        # 统一设置默认字体和字号
+        from docx.shared import Pt
+        from docx.oxml.ns import qn
+        from docx.oxml import OxmlElement
+        
+        # 设置正文样式
+        style = doc.styles['Normal']
+        font = style.font
+        font.name = '宋体'
+        font.size = Pt(12)  # 设置默认字号为12磅
+        
+        # 确保中文字体正确应用到正文
+        style.element.xpath('.//w:rPr')[0].insert(0, OxmlElement('w:rFonts'))
+        style.element.xpath('.//w:rFonts')[0].set(qn('w:eastAsia'), '宋体')
+        
+        # 设置标题样式
+        heading_style = doc.styles['Heading 1']
+        heading_font = heading_style.font
+        heading_font.name = '宋体'
+        heading_font.size = Pt(16)  # 设置标题字号为16磅
+        
+        # 确保中文字体正确应用到标题
+        heading_style.element.xpath('.//w:rPr')[0].insert(0, OxmlElement('w:rFonts'))
+        heading_style.element.xpath('.//w:rFonts')[0].set(qn('w:eastAsia'), '宋体')
+        
         for node in knowledge_tree:
-            doc.add_heading(node['title'], level=1)
+            # 清理标题中的特殊字符
+            clean_title = DocumentProcessor._clean_text_for_xml(node['title'])
+            
+            # 添加标题，统一格式
+            heading = doc.add_heading(clean_title, level=1)
+            heading.style = 'Heading 1'
+            # 确保标题使用宋体
+            for run in heading.runs:
+                run.font.name = '宋体'
+                run._element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
+            
+            # 统一内容段落格式
             if isinstance(node['content'], list):
                 for item in node['content']:
-                    doc.add_paragraph(item)
+                    # 清理内容中的特殊字符
+                    clean_item = DocumentProcessor._clean_text_for_xml(item)
+                    if clean_item.strip():  # 只添加非空内容
+                        paragraph = doc.add_paragraph(clean_item)
+                        paragraph.style = 'Normal'
+                        # 统一字体和字号
+                        for run in paragraph.runs:
+                            run.font.name = '宋体'
+                            run.font.size = Pt(12)
+                            run._element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
             else:
-                doc.add_paragraph(node['content'])
+                # 清理内容中的特殊字符
+                clean_content = DocumentProcessor._clean_text_for_xml(node['content'])
+                if clean_content.strip():  # 只添加非空内容
+                    paragraph = doc.add_paragraph(clean_content)
+                    paragraph.style = 'Normal'
+                    # 统一字体和字号
+                    for run in paragraph.runs:
+                        run.font.name = '宋体'
+                        run.font.size = Pt(12)
+                        run._element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
 
         doc.save(output_path)
         return output_path
+
+    @staticmethod
+    def _clean_text_for_xml(text):
+        """清理文本中的特殊字符，确保XML兼容性"""
+        if not isinstance(text, str):
+            text = str(text)
+        
+        # 移除控制字符（除了常见的换行符和制表符）
+        cleaned = ''.join(char for char in text if ord(char) >= 32 or char in '\n\t')
+        
+        # 替换特殊XML字符
+        cleaned = cleaned.replace('&', '&')
+        cleaned = cleaned.replace('<', '<')
+        cleaned = cleaned.replace('>', '>')
+        
+        return cleaned
 
     # export_to_pdf 保持不变（使用reportlab）
     @staticmethod

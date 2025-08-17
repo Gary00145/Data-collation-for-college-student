@@ -48,19 +48,42 @@ class DocumentProcessor:
 
                         # 处理内容结构
                         lines = cleaned_text.split('\n')
+                        skip_section = False
                         for line in lines:
                             stripped_line = line.strip()
                             if stripped_line:
+                                # 检查是否为非概念性内容的标题
+                                if DocumentProcessor.is_heading(stripped_line) and not DocumentProcessor.is_concept_content(stripped_line):
+                                    skip_section = True
+                                    current_section = None
+                                    continue
+                                
+                                # 如果需要跳过当前章节，继续跳过
+                                if skip_section:
+                                    if DocumentProcessor.is_heading(stripped_line):
+                                        # 新的标题出现，检查是否为概念性内容
+                                        if DocumentProcessor.is_concept_content(stripped_line):
+                                            skip_section = False
+                                        else:
+                                            continue
+                                    else:
+                                        continue
+                                
                                 # 如果还没有创建节，或者遇到可能的标题
                                 if current_section is None or DocumentProcessor.is_heading(stripped_line):
                                     if current_section and current_section['content']:
                                         content['sections'].append(current_section)
-                                    current_section = {
-                                        'title': stripped_line,
-                                        'content': []
-                                    }
+                                    # 检查新章节是否为概念性内容
+                                    if DocumentProcessor.is_concept_content(stripped_line):
+                                        current_section = {
+                                            'title': stripped_line,
+                                            'content': []
+                                        }
+                                    else:
+                                        current_section = None
                                 else:
-                                    current_section['content'].append(stripped_line)
+                                    if current_section is not None and DocumentProcessor.is_concept_content(stripped_line):
+                                        current_section['content'].append(stripped_line)
                 except Exception as e:
                     print(f"第 {page_num + 1} 页 PyMuPDF 解析错误: {str(e)}")
                     if current_section is None:
@@ -115,18 +138,40 @@ class DocumentProcessor:
 
                         # 处理内容结构
                         lines = cleaned_text.split('\n')
+                        skip_section = False
                         for line in lines:
                             stripped_line = line.strip()
                             if stripped_line:
+                                # 检查是否为非概念性内容的标题
+                                if DocumentProcessor.is_heading(stripped_line) and not DocumentProcessor.is_concept_content(stripped_line):
+                                    skip_section = True
+                                    current_section = None
+                                    continue
+                                
+                                # 如果需要跳过当前章节，继续跳过
+                                if skip_section:
+                                    if DocumentProcessor.is_heading(stripped_line):
+                                        # 新的标题出现，检查是否为概念性内容
+                                        if DocumentProcessor.is_concept_content(stripped_line):
+                                            skip_section = False
+                                        else:
+                                            continue
+                                    else:
+                                        continue
+                                
                                 if current_section is None or DocumentProcessor.is_heading(stripped_line):
                                     if current_section and current_section['content']:
                                         content['sections'].append(current_section)
-                                    current_section = {
-                                        'title': stripped_line,
-                                        'content': []
-                                    }
+                                    # 检查新章节是否为概念性内容
+                                    if DocumentProcessor.is_concept_content(stripped_line):
+                                        current_section = {
+                                            'title': stripped_line,
+                                            'content': []
+                                        }
+                                    else:
+                                        current_section = None
                                 else:
-                                    if current_section is not None:
+                                    if current_section is not None and DocumentProcessor.is_concept_content(stripped_line):
                                         current_section['content'].append(stripped_line)
 
             # 添加最后一节
@@ -171,6 +216,22 @@ class DocumentProcessor:
             return True
         return False
 
+    @staticmethod
+    def is_concept_content(text):
+        """判断是否为概念性内容"""
+        # 排除例子、作业等非概念性内容的关键词
+        non_concept_keywords = ["例", "例子", "示例", "例题", "习题", "练习", "作业", "课后练习", "思考题", "实验", "实训"]
+        # 如果文本以非概念性关键词开头，则不是概念内容
+        if any(text.strip().startswith(keyword) for keyword in non_concept_keywords):
+            return False
+        # 如果文本包含非概念性关键词且不是标题，则不是概念内容
+        if any(keyword in text for keyword in non_concept_keywords) and not DocumentProcessor.is_heading(text):
+            return False
+        # 特殊处理：如果文本是数字加点开头的列表项，可能是练习题（除非是重点内容）
+        if re.match(r"^\d+\.\s", text.strip()) and "重点" not in text and "要点" not in text:
+            return False
+        return True
+
 
     # 其他extract方法保持不变
     @staticmethod
@@ -185,6 +246,12 @@ class DocumentProcessor:
             if text:  # 只处理非空段落
                 if para.style.name.startswith('Heading') or DocumentProcessor.is_heading(text):
                     # 新章节开始
+                    # 检查是否为非概念性内容的标题
+                    if not DocumentProcessor.is_concept_content(text):
+                        # 跳过这个章节的所有内容
+                        current_section = None
+                        continue
+                    
                     if current_section and current_section['content']:
                         content['sections'].append(current_section)
                     current_section = {
@@ -192,13 +259,9 @@ class DocumentProcessor:
                         'content': [text]
                     }
                 else:
-                    # 内容段落
-                    if current_section is None:
-                        current_section = {
-                            'title': "文档内容",
-                            'content': []
-                        }
-                    current_section['content'].append(text)
+                    # 内容段落 - 只添加概念性内容
+                    if current_section is not None and DocumentProcessor.is_concept_content(text):
+                        current_section['content'].append(text)
 
         if current_section and current_section['content']:
             content['sections'].append(current_section)
@@ -225,6 +288,12 @@ class DocumentProcessor:
                     # 尝试识别标题和内容结构
                     text = shape.text.strip()
                     if DocumentProcessor.is_heading(text):
+                        # 检查是否为非概念性内容的标题
+                        if not DocumentProcessor.is_concept_content(text):
+                            # 跳过这个章节的所有内容
+                            current_section = None
+                            continue
+                        
                         # 如果是标题，创建新章节
                         if current_section and current_section['content']:
                             content['sections'].append(current_section)
@@ -233,13 +302,9 @@ class DocumentProcessor:
                             'content': []
                         }
                     else:
-                        # 如果是内容，添加到当前章节
-                        if current_section is None:
-                            current_section = {
-                                'title': slide_title,
-                                'content': []
-                            }
-                        current_section['content'].append(text)
+                        # 如果是内容，添加到当前章节 - 只添加概念性内容
+                        if DocumentProcessor.is_concept_content(text) and current_section is not None:
+                            current_section['content'].append(text)
 
         # 添加最后一节
         if current_section and current_section['content']:
@@ -255,15 +320,20 @@ class DocumentProcessor:
                 if slide.shapes.title and slide.shapes.title.text.strip():
                     slide_title = slide.shapes.title.text.strip()
 
-                # 提取内容
+                # 提取内容 - 只添加概念性内容
                 for shape in slide.shapes:
                     if hasattr(shape, "text") and shape != slide.shapes.title and shape.text.strip():
-                        slide_content.append(shape.text.strip())
+                        text = shape.text.strip()
+                        # 只添加概念性内容
+                        if DocumentProcessor.is_concept_content(text):
+                            slide_content.append(text)
 
-                content['sections'].append({
-                    'title': slide_title,
-                    'content': slide_content
-                })
+                # 只有当slide_content不为空时才添加
+                if slide_content:
+                    content['sections'].append({
+                        'title': slide_title,
+                        'content': slide_content
+                    })
                 
         return content
 

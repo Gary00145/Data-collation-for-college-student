@@ -2,14 +2,11 @@ import os
 import subprocess
 import sys
 import tempfile
-
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTreeWidget,
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QTreeWidget,
                              QTreeWidgetItem, QListWidget, QPushButton, QHBoxLayout,
                              QVBoxLayout, QWidget, QLabel, QSplitter, QComboBox,
-                             QAction, QMessageBox, QMenu, QTextEdit, QDialog,
-                             QDialogButtonBox, QLineEdit, QProgressBar)
-from PyQt5.QtCore import Qt, QTimer, QUrl
-
+                             QAction, QMessageBox, QMenu)
 from document_processor import DocumentProcessor
 from previewwindow import PreviewWindow
 

@@ -7,16 +7,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="51b52cc2-724e-4222-96d3-7bfc681eec97" name="更改" comment="updated&#10;improved the stability of the code">
-      <change beforePath="$PROJECT_DIR$/.idea/PythonProject3.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PythonProject3.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+    <list default="true" id="51b52cc2-724e-4222-96d3-7bfc681eec97" name="更改" comment="Add local AI summarization function and improve code stability.">
+      <changelist_data name="Du Sirui" email="13241121306@163.com" automatic="false" />
+      <change afterPath="$PROJECT_DIR$/ai_processor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/document_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/document_processor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mainwindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/previewwindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/previewwindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,11 +61,18 @@
     "Python 测试.Python 测试 (ai_processor.py 内).executor": "Run",
     "Python 测试.Python 测试 (test_export.py 内).executor": "Run",
     "Python.ai_processor.executor": "Run",
+    "Python.check_openai.executor": "Run",
     "Python.check_pyqt5.executor": "Run",
     "Python.document_processor.executor": "Run",
     "Python.main.executor": "Run",
     "Python.main2.executor": "Run",
     "Python.main_with_env.executor": "Run",
+    "Python.mainwindow.executor": "Run",
+    "Python.previewwindow.executor": "Run",
+    "Python.test_ai.executor": "Run",
+    "Python.test_edit_dialog.executor": "Run",
+    "Python.test_local_ai.executor": "Run",
+    "Python.test_xunfei_ai.executor": "Run",
     "Python.tk.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -143,7 +145,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755397868034</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="updated&#10;improved the stability of the code">
+      <option name="closed" value="true" />
+      <created>1755428458845</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1755428458845</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -174,6 +184,7 @@
     <MESSAGE value="Update all&#10;improved the code stabilities" />
     <MESSAGE value="updated" />
     <MESSAGE value="updated&#10;improved the stability of the code" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated&#10;improved the stability of the code" />
+    <MESSAGE value="Add local AI summarization function and improve code stability." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add local AI summarization function and improve code stability." />
   </component>
 </project>

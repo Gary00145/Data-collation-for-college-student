@@ -6,9 +6,11 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QTreeWidget,
                              QTreeWidgetItem, QListWidget, QPushButton, QHBoxLayout,
                              QVBoxLayout, QWidget, QLabel, QSplitter, QComboBox,
-                             QAction, QMessageBox, QMenu)
+                             QAction, QMessageBox, QMenu, QProgressDialog, QDialog,
+                             QTextEdit, QLineEdit, QDialogButtonBox)
 from document_processor import DocumentProcessor
 from previewwindow import PreviewWindow
+from ai_processor import AIProcessor
 
 
 class MainWindow(QMainWindow):
@@ -149,22 +151,26 @@ class MainWindow(QMainWindow):
             self.update_status(f"已删除 {len(selected_items)} 个节点")
 
     def edit_selected_node(self):
-        """编辑选中的节点 - 简化版"""
+        """编辑选中的节点"""
         selected_items = self.tree_widget.selectedItems()
         if not selected_items or len(selected_items) > 1:
             QMessageBox.warning(self, "警告", "请选择单个节点进行编辑")
             return
 
         item = selected_items[0]
-        node_data = item.data(0, Qt.UserRole)
-
-        # 这里简化处理，实际应用中应该弹出编辑对话框
-        QMessageBox.information(
-            self,
-            "节点编辑",
-            f"实际应用中这里应该提供编辑界面\n当前节点标题: {node_data['title']}"
-        )
-
+        node_index = self.tree_widget.indexOfTopLevelItem(item)
+        if 0 <= node_index < len(self.knowledge_tree):
+            node_data = self.knowledge_tree[node_index]
+            # 打开编辑对话框
+            dialog = NodeEditDialog(node_data, self)
+            if dialog.exec_() == QDialog.Accepted:
+                # 更新节点数据
+                updated_data = dialog.get_data()
+                self.knowledge_tree[node_index] = updated_data
+                # 更新UI显示
+                item.setText(0, f"{node_index + 1}. {updated_data['title']}")
+                item.setData(0, Qt.UserRole, updated_data)
+                self.update_status("节点已更新")
 
     def init_ui(self):
         """初始化用户界面"""
@@ -186,6 +192,10 @@ class MainWindow(QMainWindow):
         btn_generate = QPushButton("生成知识结构")
         btn_generate.clicked.connect(self.generate_knowledge_tree)
 
+        # AI处理按钮
+        btn_ai_process = QPushButton("AI二次总结")
+        btn_ai_process.clicked.connect(self.process_with_ai)
+
         # 导出选项
         export_layout = QHBoxLayout()
         self.export_combo = QComboBox()
@@ -199,6 +209,7 @@ class MainWindow(QMainWindow):
         left_panel.addWidget(self.file_list)
         left_panel.addWidget(btn_upload)
         left_panel.addWidget(btn_generate)
+        left_panel.addWidget(btn_ai_process)
         left_panel.addLayout(export_layout)
 
         # 右侧面板：知识树和预览
@@ -284,6 +295,52 @@ class MainWindow(QMainWindow):
             self.tree_widget.addTopLevelItem(item)
 
         self.update_status("知识结构已生成")
+
+    def process_with_ai(self):
+        """使用AI进行二次总结"""
+        if not self.knowledge_tree:
+            self.update_status("请先生成知识结构")
+            return
+
+        # 创建进度对话框
+        progress = QProgressDialog("正在使用AI进行二次总结...", "取消", 0, 3, self)
+        progress.setWindowModality(Qt.WindowModal)
+        progress.setWindowTitle("AI处理中")
+        progress.show()
+
+        try:
+            # 初始化AI处理器
+            progress.setLabelText("初始化AI处理器...")
+            progress.setValue(1)
+            ai_processor = AIProcessor()
+
+            # 准备内容
+            progress.setLabelText("准备内容...")
+            progress.setValue(2)
+            content = ai_processor.prepare_content_for_ai(self.knowledge_tree)
+
+            # 发送到AI处理
+            progress.setLabelText("发送到AI进行处理...")
+            progress.setValue(3)
+            ai_response = ai_processor.send_to_ai(content)
+
+            # 解析AI响应
+            self.knowledge_tree = ai_processor.parse_ai_response(ai_response)
+
+            # 更新树状视图
+            self.tree_widget.clear()
+            for i, node in enumerate(self.knowledge_tree):
+                item = QTreeWidgetItem([f"{i + 1}. {node['title']}"])
+                item.setData(0, Qt.UserRole, node)
+                self.tree_widget.addTopLevelItem(item)
+
+            self.update_status("AI二次总结完成")
+            progress.close()
+
+        except Exception as e:
+            progress.close()
+            QMessageBox.critical(self, "AI处理失败", f"AI处理过程中出现错误: {str(e)}")
+            self.update_status(f"AI处理失败: {str(e)}")
 
     def show_preview(self, item, column):
         """显示文件预览"""
@@ -377,3 +434,60 @@ class MainWindow(QMainWindow):
     def update_status(self, message):
         """更新状态栏"""
         self.statusBar().showMessage(message, 5000)
+
+
+class NodeEditDialog(QDialog):
+    """节点编辑对话框"""
+
+    def __init__(self, node_data, parent=None):
+        super().__init__(parent)
+        self.node_data = node_data.copy()  # 复制数据以避免直接修改原始数据
+        self.init_ui()
+
+    def init_ui(self):
+        """初始化UI"""
+        self.setWindowTitle("编辑节点")
+        self.setModal(True)
+        self.resize(500, 400)
+
+        layout = QVBoxLayout()
+
+        # 标题输入
+        layout.addWidget(QLabel("标题:"))
+        self.title_edit = QLineEdit(self.node_data.get('title', ''))
+        layout.addWidget(self.title_edit)
+
+        # 内容输入
+        layout.addWidget(QLabel("内容:"))
+        self.content_edit = QTextEdit()
+        content = self.node_data.get('content', '')
+        if isinstance(content, list):
+            content = '\n'.join(content)
+        self.content_edit.setPlainText(content)
+        layout.addWidget(self.content_edit)
+
+        # 按钮框
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        )
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+        layout.addWidget(button_box)
+
+        self.setLayout(layout)
+
+    def get_data(self):
+        """获取编辑后的数据"""
+        return {
+            'title': self.title_edit.text(),
+            'content': self.content_edit.toPlainText(),
+            'children': self.node_data.get('children', [])
+        }
+
+
+# This is the main program that runs the GUI
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())

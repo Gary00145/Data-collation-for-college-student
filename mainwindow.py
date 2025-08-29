@@ -3,7 +3,7 @@ import subprocess
 import sys
 import tempfile
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QTreeWidget,
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTreeWidget,
                              QTreeWidgetItem, QListWidget, QPushButton, QHBoxLayout,
                              QVBoxLayout, QWidget, QLabel, QSplitter, QComboBox,
                              QAction, QMessageBox, QMenu, QProgressDialog, QDialog,
@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QTreeWidget,
 from document_processor import DocumentProcessor
 from previewwindow import PreviewWindow
 from ai_processor import AIProcessor
+from styles import STYLESHEET, COLORS
 
 
 class MainWindow(QMainWindow):
@@ -19,7 +20,18 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("大学生资料整理平台")
-        self.setGeometry(100, 100, 1200, 800)
+        # 使用相对尺寸设置窗口大小
+        self.resize(1200, 800)
+        screen = QApplication.primaryScreen().availableGeometry()
+        self.setGeometry(
+            (screen.width() - 1200) // 2,
+            (screen.height() - 800) // 2,
+            1200,
+            800
+        )
+        
+        # 应用样式表
+        self.setStyleSheet(STYLESHEET)
 
         # 数据结构
         self.documents = []
@@ -177,35 +189,48 @@ class MainWindow(QMainWindow):
         # 主布局
         main_widget = QWidget()
         main_layout = QHBoxLayout()
+        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(15, 15, 15, 15)
 
         # 左侧面板：文件操作
         left_panel = QVBoxLayout()
+        left_panel.setSpacing(10)
 
-        # 文件列表
+        # 文件列表标题和列表
+        file_label = QLabel("已上传文件:")
+        file_label.setObjectName("fileLabel")
         self.file_list = QListWidget()
-        self.file_list.setMaximumWidth(300)
+        self.file_list.setMinimumHeight(200)
 
         # 操作按钮
         btn_upload = QPushButton("上传文件")
         btn_upload.clicked.connect(self.upload_files)
+        btn_upload.setMinimumHeight(35)
 
         btn_generate = QPushButton("生成知识结构")
         btn_generate.clicked.connect(self.generate_knowledge_tree)
+        btn_generate.setMinimumHeight(35)
 
         # AI处理按钮
         btn_ai_process = QPushButton("AI二次总结")
         btn_ai_process.clicked.connect(self.process_with_ai)
+        btn_ai_process.setMinimumHeight(35)
 
         # 导出选项
         export_layout = QHBoxLayout()
+        export_label = QLabel("导出格式:")
+        export_label.setObjectName("exportLabel")
         self.export_combo = QComboBox()
         self.export_combo.addItems(["导出为Word", "导出为PDF"])
+        self.export_combo.setMinimumHeight(30)
         btn_export = QPushButton("导出")
         btn_export.clicked.connect(self.export_document)
+        btn_export.setMinimumHeight(35)
+        export_layout.addWidget(export_label)
         export_layout.addWidget(self.export_combo)
         export_layout.addWidget(btn_export)
 
-        left_panel.addWidget(QLabel("已上传文件:"))
+        left_panel.addWidget(file_label)
         left_panel.addWidget(self.file_list)
         left_panel.addWidget(btn_upload)
         left_panel.addWidget(btn_generate)
@@ -214,17 +239,23 @@ class MainWindow(QMainWindow):
 
         # 右侧面板：知识树和预览
         right_panel = QVBoxLayout()
+        right_panel.setSpacing(10)
 
-        # 知识结构树
+        # 知识结构标题和树
+        tree_label = QLabel("知识结构:")
+        tree_label.setObjectName("treeLabel")
         self.tree_widget = QTreeWidget()
         self.tree_widget.setHeaderLabel("知识结构")
         self.tree_widget.itemClicked.connect(self.show_preview)
+        self.tree_widget.setMinimumHeight(300)
 
-        right_panel.addWidget(QLabel("知识结构:"))
+        right_panel.addWidget(tree_label)
         right_panel.addWidget(self.tree_widget)
 
         # 组合布局
         splitter = QSplitter(Qt.Horizontal)
+        splitter.setHandleWidth(8)
+        
         left_widget = QWidget()
         left_widget.setLayout(left_panel)
         right_widget = QWidget()
@@ -449,22 +480,28 @@ class NodeEditDialog(QDialog):
         self.setWindowTitle("编辑节点")
         self.setModal(True)
         self.resize(500, 400)
+        # 应用样式
+        self.setStyleSheet(STYLESHEET)
 
         layout = QVBoxLayout()
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
 
         # 标题输入
-        layout.addWidget(QLabel("标题:"))
+        title_label = QLabel("标题:")
+        title_label.setObjectName("titleLabel")
         self.title_edit = QLineEdit(self.node_data.get('title', ''))
-        layout.addWidget(self.title_edit)
+        self.title_edit.setMinimumHeight(30)
 
         # 内容输入
-        layout.addWidget(QLabel("内容:"))
+        content_label = QLabel("内容:")
+        content_label.setObjectName("contentLabel")
         self.content_edit = QTextEdit()
         content = self.node_data.get('content', '')
         if isinstance(content, list):
             content = '\n'.join(content)
         self.content_edit.setPlainText(content)
-        layout.addWidget(self.content_edit)
+        self.content_edit.setMinimumHeight(200)
 
         # 按钮框
         button_box = QDialogButtonBox(
@@ -472,6 +509,15 @@ class NodeEditDialog(QDialog):
         )
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
+        ok_button = button_box.button(QDialogButtonBox.Ok)
+        cancel_button = button_box.button(QDialogButtonBox.Cancel)
+        ok_button.setMinimumHeight(35)
+        cancel_button.setMinimumHeight(35)
+
+        layout.addWidget(title_label)
+        layout.addWidget(self.title_edit)
+        layout.addWidget(content_label)
+        layout.addWidget(self.content_edit)
         layout.addWidget(button_box)
 
         self.setLayout(layout)

@@ -220,7 +220,7 @@ class DocumentProcessor:
     def is_concept_content(text):
         """判断是否为概念性内容"""
         # 排除例子、作业等非概念性内容的关键词
-        non_concept_keywords = ["例", "例子", "示例", "例题", "习题", "练习", "作业", "课后练习", "思考题", "实验", "实训"]
+        non_concept_keywords = ["例", "例子", "示例", "例题", "习题", "练习", "作业", "课后练习", "思考题", "实验", "实训","课堂作业"]
         # 如果文本以非概念性关键词开头，则不是概念内容
         if any(text.strip().startswith(keyword) for keyword in non_concept_keywords):
             return False

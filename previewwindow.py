@@ -8,6 +8,7 @@ from PyQt5.QtGui import QTextDocument, QPixmap
 from PyQt5.QtWidgets import (QPushButton, QVBoxLayout, QWidget, QLabel, QTextEdit, QProgressBar)
 from docx import Document
 from pptx import Presentation
+from styles import STYLESHEET
 
 
 class PreviewWindow(QWidget):
@@ -17,17 +18,25 @@ class PreviewWindow(QWidget):
         super().__init__()
         self.setWindowTitle("文件预览")
         self.setGeometry(100, 100, 800, 600)
+        
+        # 应用样式表
+        self.setStyleSheet(STYLESHEET)
 
         self.layout = QVBoxLayout()
+        self.layout.setSpacing(10)
+        self.layout.setContentsMargins(15, 15, 15, 15)
 
         # 状态标签
         self.status_label = QLabel("准备预览...")
         self.status_label.setAlignment(Qt.AlignCenter)
+        self.status_label.setMinimumHeight(30)
+        self.status_label.setObjectName("statusLabel")
         self.layout.addWidget(self.status_label)
 
         # 进度条
         self.progress_bar = QProgressBar()
         self.progress_bar.setVisible(False)
+        self.progress_bar.setMinimumHeight(20)
         self.layout.addWidget(self.progress_bar)
 
         # 安全预览模式按钮
@@ -35,11 +44,13 @@ class PreviewWindow(QWidget):
         self.safe_mode_btn.setCheckable(True)
         self.safe_mode_btn.setChecked(True)
         self.safe_mode_btn.toggled.connect(self.toggle_safe_mode)
+        self.safe_mode_btn.setMinimumHeight(35)
         self.layout.addWidget(self.safe_mode_btn)
 
         # 文本预览区域
         self.preview_text = QTextEdit()
         self.preview_text.setReadOnly(True)
+        self.preview_text.setMinimumHeight(400)
         self.layout.addWidget(self.preview_text)
 
         self.setLayout(self.layout)

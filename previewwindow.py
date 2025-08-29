@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+
 import fitz  # 使用最新版 PyMuPDF 1.23.0 或更高版本
 import pdfplumber
 from PyQt5.QtCore import Qt, QTimer, QUrl
@@ -8,6 +9,7 @@ from PyQt5.QtGui import QTextDocument, QPixmap
 from PyQt5.QtWidgets import (QPushButton, QVBoxLayout, QWidget, QLabel, QTextEdit, QProgressBar)
 from docx import Document
 from pptx import Presentation
+
 from styles import STYLESHEET
 
 

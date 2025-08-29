@@ -2,16 +2,18 @@ import os
 import subprocess
 import sys
 import tempfile
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTreeWidget,
                              QTreeWidgetItem, QListWidget, QPushButton, QHBoxLayout,
                              QVBoxLayout, QWidget, QLabel, QSplitter, QComboBox,
                              QAction, QMessageBox, QMenu, QProgressDialog, QDialog,
                              QTextEdit, QLineEdit, QDialogButtonBox)
+
+from ai_processor import AIProcessor
 from document_processor import DocumentProcessor
 from previewwindow import PreviewWindow
-from ai_processor import AIProcessor
-from styles import STYLESHEET, COLORS
+from styles import STYLESHEET
 
 
 class MainWindow(QMainWindow):

@@ -7,11 +7,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="51b52cc2-724e-4222-96d3-7bfc681eec97" name="更改" comment="Add local AI summarization function and improve code stability.">
+    <list default="true" id="51b52cc2-724e-4222-96d3-7bfc681eec97" name="更改" comment="improve code stability.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/document_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/document_processor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mainwindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/previewwindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/previewwindow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles.py" beforeDir="false" afterPath="$PROJECT_DIR$/styles.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,34 +57,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python 测试.Python 测试 (ai_processor.py 内).executor&quot;: &quot;Run&quot;,
-    &quot;Python 测试.Python 测试 (test_export.py 内).executor&quot;: &quot;Run&quot;,
-    &quot;Python.ai_processor.executor&quot;: &quot;Run&quot;,
-    &quot;Python.check_openai.executor&quot;: &quot;Run&quot;,
-    &quot;Python.check_pyqt5.executor&quot;: &quot;Run&quot;,
-    &quot;Python.document_processor.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main_with_env.executor&quot;: &quot;Run&quot;,
-    &quot;Python.mainwindow.executor&quot;: &quot;Run&quot;,
-    &quot;Python.previewwindow.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_ai.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_edit_dialog.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_local_ai.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_ui.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_xunfei_ai.executor&quot;: &quot;Run&quot;,
-    &quot;Python.tk.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Data-collation-for-college-student&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.appearance&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python 测试.Python 测试 (ai_processor.py 内).executor": "Run",
+    "Python 测试.Python 测试 (test_export.py 内).executor": "Run",
+    "Python.ai_processor.executor": "Run",
+    "Python.check_openai.executor": "Run",
+    "Python.check_pyqt5.executor": "Run",
+    "Python.document_processor.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.main2.executor": "Run",
+    "Python.main_with_env.executor": "Run",
+    "Python.mainwindow.executor": "Run",
+    "Python.previewwindow.executor": "Run",
+    "Python.test_ai.executor": "Run",
+    "Python.test_edit_dialog.executor": "Run",
+    "Python.test_local_ai.executor": "Run",
+    "Python.test_ui.executor": "Run",
+    "Python.test_xunfei_ai.executor": "Run",
+    "Python.tk.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "D:/Data-collation-for-college-student",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "advanced.settings"
   }
-}</component>
+}]]></component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings module-name="PythonProject3" is-module-sdk="true">
@@ -97,6 +100,9 @@
         <option value="bundled-python-sdk-d9fa9deec7cb-d902c0275401-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-252.23892.515" />
       </set>
     </attachedChunks>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration>C:\Users\杜思睿\AppData\Roaming\Subversion</configuration>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="默认任务">
@@ -178,7 +184,39 @@
       <option name="project" value="LOCAL" />
       <updated>1755481940755</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="improve code stability.">
+      <option name="closed" value="true" />
+      <created>1756473397670</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1756473397670</updated>
+    </task>
+    <task id="LOCAL-00011" summary="improve code stability.">
+      <option name="closed" value="true" />
+      <created>1756473793603</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1756473793603</updated>
+    </task>
+    <task id="LOCAL-00012" summary="improve code stability.">
+      <option name="closed" value="true" />
+      <created>1756473951710</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1756473951710</updated>
+    </task>
+    <task id="LOCAL-00013" summary="improve code stability.">
+      <option name="closed" value="true" />
+      <created>1756474340386</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1756474340386</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -210,6 +248,7 @@
     <MESSAGE value="updated" />
     <MESSAGE value="updated&#10;improved the stability of the code" />
     <MESSAGE value="Add local AI summarization function and improve code stability." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add local AI summarization function and improve code stability." />
+    <MESSAGE value="improve code stability." />
+    <option name="LAST_COMMIT_MESSAGE" value="improve code stability." />
   </component>
 </project>

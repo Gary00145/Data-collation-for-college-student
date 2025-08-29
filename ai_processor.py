@@ -1,6 +1,5 @@
 import re
 import time
-
 from docx import Document
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
